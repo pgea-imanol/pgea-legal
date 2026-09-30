@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Eliminar mi cuenta · PGEA Puro Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #FBF8F3; --ink: #141414; --muted: #6F6861; --accent: #B03D29; --card: #FFFFFF; --line: #E3DCD2; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; line-height: 1.6; }
+  header { background: var(--ink); color: var(--bg); padding: 28px 16px; text-align: center; }
+  header a { color: var(--bg); text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: .5px; }
+  header p { margin: 4px 0 0; opacity: .7; font-size: 14px; }
+  nav { display: flex; justify-content: center; gap: 18px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  nav a { color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: none; }
+  nav a.on { color: var(--accent); }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 6px; }
+  .updated { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: 16px; padding: 20px; margin-top: 16px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px 16px 40px; }
+</style>
+</head>
+<body>
+<header><a href="index.html">PGEA</a><p>Puro Golf Entre Amigos</p></header>
+<nav>
+  <a href="index.html">Inicio</a>
+  <a href="terminos.html">Términos</a>
+  <a href="privacidad.html">Privacidad</a>
+  <a href="soporte.html">Soporte</a>
+</nav>
+<main>
+<h1>Eliminar tu cuenta de PGEA</h1>
+<p>PGEA Puro Golf es una app de Imanol Pagaza (Pagaza Digital). Puedes pedir que borremos tu cuenta y tus datos de dos formas:</p>
+<div class="card">
+<h2 style="margin-top:0">1. Desde la app</h2>
+<p>Entra a <strong>Yo › Ayuda, términos y privacidad › Contacto</strong>, elige <strong>"Eliminar mi cuenta"</strong> y envía la solicitud.</p>
+</div>
+<div class="card">
+<h2 style="margin-top:0">2. Desde aquí, sin abrir la app</h2>
+<p>Escribe el correo con el que creaste tu cuenta:</p>
+<form id="f" style="display:flex;flex-direction:column;gap:10px">
+<input id="email" type="email" required placeholder="tu@correo.com" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px">
+<textarea id="reason" rows="3" placeholder="¿Por qué te vas? (opcional)" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px"></textarea>
+<button type="submit" style="font:inherit;font-weight:700;color:#fff;background:var(--accent);border:0;border-radius:999px;padding:14px">Solicitar eliminar mi cuenta</button>
+<p id="msg" style="margin:0"></p>
+</form>
+</div>
+<h2>Qué se borra</h2>
+<p>Tu perfil (nombre, foto, handicap), tus rondas y estadísticas, publicaciones, fotos y videos, comentarios y reacciones, amistades, tu sliding, tus juegos guardados, los torneos que organizaste y tus premios.</p>
+<h2>Qué se conserva y por cuánto tiempo</h2>
+<p>Borramos todo en un máximo de <strong>30 días</strong> desde tu solicitud. Tu solicitud se guarda hasta atenderla. Si participaste en torneos o partidas de otros jugadores, tu nombre puede quedar en sus resultados como texto, sin enlace a tu cuenta. No vendemos ni compartimos tus datos.</p>
+<script>
+document.getElementById('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById('msg');
+  msg.textContent = 'Enviando…';
+  try {
+    const r = await fetch("https://sszjqnlajcddhowyndmz.supabase.co/rest/v1/rpc/request_account_deletion", {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', apikey: "sb_publishable_v35dRoOOVDgdTp_wzrNQCQ_ef-y7kMW", Authorization: 'Bearer ' + "sb_publishable_v35dRoOOVDgdTp_wzrNQCQ_ef-y7kMW" },
+      body: JSON.stringify({ p_email: document.getElementById('email').value, p_reason: document.getElementById('reason').value }),
+    });
+    const ok = r.ok && (await r.json()) === true;
+    msg.textContent = ok ? 'Recibimos tu solicitud. Borraremos tu cuenta y tus datos en un máximo de 30 días y te avisaremos a tu correo.' : 'Revisa tu correo e inténtalo de nuevo.';
+    msg.style.color = ok ? '#2F6B3F' : '#B03D29';
+  } catch {
+    msg.textContent = 'No se pudo enviar. Inténtalo de nuevo.';
+    msg.style.color = '#B03D29';
+  }
+});
+</script>
+</main>
+<footer>App desarrollada por Pagaza Digital © 2026</footer>
+</body>
+</html>

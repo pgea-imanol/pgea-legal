@@ -38,6 +38,7 @@
 <form id="f" style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
 <input id="p1" type="password" required minlength="6" autocomplete="new-password" placeholder="Nueva contraseña (mínimo 6 caracteres)" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px">
 <input id="p2" type="password" required minlength="6" autocomplete="new-password" placeholder="Repite la contraseña" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px">
+<label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)"><input id="show" type="checkbox"> Mostrar contraseña</label>
 <button type="submit" style="font:inherit;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:999px;padding:14px">Guardar contraseña</button>
 <p id="msg" style="margin:0"></p>
 </form>
@@ -49,6 +50,9 @@ if (location.hash || location.search) history.replaceState(null, '', location.pa
 const form = document.getElementById('f');
 const msg = document.getElementById('msg');
 function say(text, ok) { msg.textContent = text; msg.style.color = ok ? '#2F6B3F' : '#B03D29'; }
+document.getElementById('show').addEventListener('change', (e) => {
+  for (const id of ['p1', 'p2']) document.getElementById(id).type = e.target.checked ? 'text' : 'password';
+});
 if (!token) {
   form.querySelectorAll('input,button').forEach((el) => (el.disabled = true));
   say(params.get('error_description') ? 'El enlace ya venció o ya se usó. Pide uno nuevo desde la app con "¿Olvidaste tu contraseña?".' : 'Abre esta página desde el enlace del correo que te mandamos.', false);

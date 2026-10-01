@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nueva contraseña · PGEA Puro Golf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #FBF8F3; --ink: #141414; --muted: #6F6861; --accent: #B03D29; --card: #FFFFFF; --line: #E3DCD2; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Inter, system-ui, sans-serif; line-height: 1.6; }
+  header { background: var(--ink); color: var(--bg); padding: 28px 16px; text-align: center; }
+  header a { color: var(--bg); text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: .5px; }
+  header p { margin: 4px 0 0; opacity: .7; font-size: 14px; }
+  nav { display: flex; justify-content: center; gap: 18px; padding: 14px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  nav a { color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: none; }
+  nav a.on { color: var(--accent); }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 28px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 6px; }
+  .updated { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  .card { background: var(--card); border-radius: 16px; padding: 20px; margin-top: 16px; }
+  footer { text-align: center; color: var(--muted); font-size: 12px; padding: 24px 16px 40px; }
+</style>
+</head>
+<body>
+<header><a href="index.html">PGEA</a><p>Puro Golf Entre Amigos</p></header>
+<nav>
+  <a href="index.html">Inicio</a>
+  <a href="terminos.html">Términos</a>
+  <a href="privacidad.html">Privacidad</a>
+  <a href="soporte.html">Soporte</a>
+</nav>
+<main>
+<div class="card">
+<h1>Elige tu nueva contraseña</h1>
+<form id="f" style="display:flex;flex-direction:column;gap:10px;margin-top:12px">
+<input id="p1" type="password" required minlength="6" autocomplete="new-password" placeholder="Nueva contraseña (mínimo 6 caracteres)" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px">
+<input id="p2" type="password" required minlength="6" autocomplete="new-password" placeholder="Repite la contraseña" style="font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px">
+<button type="submit" style="font:inherit;font-weight:700;color:#fff;background:var(--ink);border:0;border-radius:999px;padding:14px">Guardar contraseña</button>
+<p id="msg" style="margin:0"></p>
+</form>
+</div>
+<script>
+const params = new URLSearchParams(location.hash.slice(1));
+const token = params.get('access_token');
+if (location.hash || location.search) history.replaceState(null, '', location.pathname);
+const form = document.getElementById('f');
+const msg = document.getElementById('msg');
+function say(text, ok) { msg.textContent = text; msg.style.color = ok ? '#2F6B3F' : '#B03D29'; }
+if (!token) {
+  form.querySelectorAll('input,button').forEach((el) => (el.disabled = true));
+  say(params.get('error_description') ? 'El enlace ya venció o ya se usó. Pide uno nuevo desde la app con "¿Olvidaste tu contraseña?".' : 'Abre esta página desde el enlace del correo que te mandamos.', false);
+}
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const p1 = document.getElementById('p1').value;
+  if (p1 !== document.getElementById('p2').value) return say('Las contraseñas no coinciden.', false);
+  say('Guardando…', true);
+  try {
+    const r = await fetch("https://sszjqnlajcddhowyndmz.supabase.co/auth/v1/user", {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', apikey: "sb_publishable_v35dRoOOVDgdTp_wzrNQCQ_ef-y7kMW", Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ password: p1 }),
+    });
+    if (r.ok) {
+      form.innerHTML = '<p style="font-size:44px;margin:0;text-align:center">⛳</p><h2 style="text-align:center;margin:0">¡Listo!</h2><p style="text-align:center">Tu contraseña cambió. Vuelve a la app <strong>PGEA</strong> e inicia sesión con la nueva.</p>';
+    } else {
+      const body = await r.json().catch(() => ({}));
+      say(r.status === 401 || r.status === 403 ? 'El enlace ya venció. Pide uno nuevo desde la app.' : body.msg && /different/i.test(body.msg) ? 'Usa una contraseña distinta a la anterior.' : 'No se pudo guardar. Revisa que tenga al menos 6 caracteres e inténtalo de nuevo.', false);
+    }
+  } catch {
+    say('No se pudo guardar. Revisa tu conexión e inténtalo de nuevo.', false);
+  }
+});
+</script>
+</main>
+<footer>App desarrollada por Pagaza Digital © 2026</footer>
+</body>
+</html>
